@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Queue;
 import java.util.Random;
@@ -13,6 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class MainScreen extends ScreenAdapter {
     private static final String[] pipeName = {"tube.png","tube2.png","tube3.png","tube4.png"};
+    private static final Texture textureGround = new Texture(Gdx.files.internal("ground.png"));
 
     private final FlappyBirdGame game;
     private final Bird bird;
@@ -31,13 +33,14 @@ public class MainScreen extends ScreenAdapter {
         background= new Background(game);
         gameOver = new GameOverText(game);
         startButton = new StartButton(game);
-        firstPipeline = new Pipeline(game, new Texture(Gdx.files.internal(pipeName[1])));
+        firstPipeline = new Pipeline(game);
         lastPipeline = firstPipeline;
         pipelines.add(firstPipeline);
     }
 
     @Override
     public void render (float delta) {
+
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -57,6 +60,10 @@ public class MainScreen extends ScreenAdapter {
             pipeline.render(delta);
         }
 
+        batch.begin();
+        batch.draw(textureGround, 0, 0, game.getScreenWidth(), game.getScreenHeight()/6);
+        batch.end();
+
         // render the bird
         bird.render(delta);
 
@@ -67,16 +74,25 @@ public class MainScreen extends ScreenAdapter {
         }
 
         // produce new pipleline
-        if (lastPipeline.getX() + lastPipeline.getWidth() + 150 < game.getScreenWidth() ) {
+        if (lastPipeline.getX() + lastPipeline.getWidth() + 200 < game.getScreenWidth() ) {
             int pipeNumber = randomPipelineNumberGenerator.nextInt(4);
-            lastPipeline = new Pipeline(game, new Texture(Gdx.files.internal(pipeName[pipeNumber])));
+            lastPipeline = new Pipeline(game);
             pipelines.add(lastPipeline);
         }
 
-        if(bird.hitBoundary())
+        if(bird.hitBoundary() || collides(bird.getBirdShape()))
         {
             gameOver.render(delta);
             startButton.render(delta);
         }
+    }
+
+    private boolean collides(Rectangle birdShape) {
+        for (Pipeline pipes : pipelines) {
+            if (pipes.collides(birdShape)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

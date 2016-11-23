@@ -65,4 +65,8 @@ public class Bird implements GameObject {
                 break;
         }
     }
+
+    public Rectangle getBirdShape() {
+        return birdShape;
+    }
 }
