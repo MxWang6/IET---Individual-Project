@@ -3,10 +3,16 @@ package ie.tcd.mengxia;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Bird implements GameObject {
-    private static final Texture texture = new Texture(Gdx.files.internal("bird.png")); // 136 * 96
+    private static final Texture texture = new Texture(Gdx.files.internal("birdanimation.png")); // 136 * 96
+    private static final Animation birdAnimation = new Animation(0.3f,
+            new TextureRegion(texture, 0, 0, texture.getWidth()/3, texture.getHeight()),
+            new TextureRegion(texture, texture.getWidth()/3, 0, texture.getWidth()/3, texture.getHeight()),
+            new TextureRegion(texture, texture.getWidth()/3*2, 0, texture.getWidth()/3, texture.getHeight()));
+
     private static final Sound upSound = Gdx.audio.newSound(Gdx.files.internal("audio/up.wav"));
 
     private final FlappyBirdGame game;
@@ -15,14 +21,16 @@ public class Bird implements GameObject {
     private final float topBoundary;
     private final float bottomBoundary;
     private final Rectangle birdShape;
-
-    public Bird(FlappyBirdGame game) {
+    private float stateTime = 0;
+   public Bird(FlappyBirdGame game) {
         this.game = game;
         dropVelocity = game.getScreenHeight() / 5;  // /s
         upDistance = 15;
 
-        float birdWidth = texture.getWidth() / 2;
-        float birdHeight = texture.getHeight() / 2;
+        // float birdWidth = texture.getWidth() / 2;
+        // float birdHeight = texture.getHeight() / 2;
+        float birdWidth = texture.getWidth()/3 * 2;
+        float birdHeight = texture.getHeight() * 2;
         // initial bird position (x, y) with width and height in the view port coord.
         birdShape = new Rectangle();
         birdShape.setWidth(birdWidth);
@@ -38,9 +46,9 @@ public class Bird implements GameObject {
     @Override
     public void render(float delta) {
         updatePosition(delta);
-
+        stateTime += delta;
         game.getBatch().begin();
-        game.getBatch().draw(texture, birdShape.getX(), birdShape.getY(), birdShape.getWidth(), birdShape.getHeight());
+        game.getBatch().draw(birdAnimation.getKeyFrame(stateTime, Animation.Mode.LOOPING), birdShape.getX(), birdShape.getY(), birdShape.getWidth(), birdShape.getHeight());
         game.getBatch().end();
     }
 

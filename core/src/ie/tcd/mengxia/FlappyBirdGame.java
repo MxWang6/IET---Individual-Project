@@ -1,27 +1,45 @@
 package ie.tcd.mengxia;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+
+import java.awt.Font;
 
 public class FlappyBirdGame extends Game {
 	private SpriteBatch batch;
-	private int screenWidth;
-	private int screenHeight;
-	private float ratio;
+	private static final int screenWidth = 607;
+	private static final int screenHeight = 1080;
 	private OrthographicCamera camera;
 	private GameStatus status;
+	private Music backgroundMusic;
+	public static BitmapFont font;
 
 	@Override
 	public void create () {
-		screenWidth = 607; //Gdx.app.getGraphics().getWidth();
-		screenHeight = 1080; //Gdx.app.getGraphics().getHeight();
-		ratio = screenWidth / screenHeight;   // 16/9
-
 		batch = new SpriteBatch();
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera(screenWidth, screenHeight);
 		camera.position.set(screenWidth / 2, screenHeight / 2, 0);
+
+		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music.mp3"));
+		backgroundMusic.setLooping(true);
+		backgroundMusic.setVolume(0.1f);
+		backgroundMusic.play();
+
+//		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("KR_Toon_Numbers.ttf"));
+//		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+//		parameter.size = 18;
+//		font = generator.generateFont(parameter); // font size 12 pixels
+//		generator.dispose();
+
+
+		 font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
 
 		// TODO we need to change to the game ready when we introduce game ready.
 		status = GameStatus.GAME_START;

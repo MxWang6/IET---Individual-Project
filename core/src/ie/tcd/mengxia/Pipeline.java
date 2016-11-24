@@ -16,6 +16,7 @@ public class Pipeline implements GameObject {
     private static Random random = new Random();
     private static final int GAP_HEIGHT = 200;
     private static final int RANDOM = 500;
+    private boolean justPassed = false;
 
     public Pipeline(FlappyBirdGame game) {
         this.game = game;
@@ -58,6 +59,14 @@ public class Pipeline implements GameObject {
     public boolean collides(Rectangle boundsBird) {
         final boolean isColliding = boundsBird.overlaps(top) || boundsBird.overlaps(bottom);
         return isColliding;
+    }
+
+    public boolean justPassed(Rectangle birdShape) {
+        if (!justPassed && birdShape.x > top.x + top.width) {
+                return justPassed = true;
+        }
+
+        return false;
     }
 
     public float getX() {

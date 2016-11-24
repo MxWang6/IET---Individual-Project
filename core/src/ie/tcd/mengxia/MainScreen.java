@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.Queue;
 import java.util.Random;
@@ -26,6 +27,9 @@ public class MainScreen extends ScreenAdapter {
 
     private Pipeline firstPipeline;
     private Pipeline lastPipeline;
+
+    private int score = 0;
+    private float scoreShowTime = 0;
 
     public MainScreen(FlappyBirdGame game) {
         this.game = game;
@@ -85,11 +89,29 @@ public class MainScreen extends ScreenAdapter {
             gameOver.render(delta);
             startButton.render(delta);
         }
+
+        if (justPassed(bird.getBirdShape())) {
+            score ++;
+        }
+
+        game.getBatch().begin();
+        String scoreString = Integer.toString(score);
+        game.font.draw(game.getBatch(), scoreString, game.getScreenWidth()/2, game.getScreenHeight()/3 * 2);
+        game.getBatch().end();
     }
 
     private boolean collides(Rectangle birdShape) {
-        for (Pipeline pipes : pipelines) {
-            if (pipes.collides(birdShape)) {
+        for (Pipeline pipe : pipelines) {
+            if (pipe.collides(birdShape)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean justPassed(Rectangle birdShape) {
+        for (Pipeline pipe : pipelines) {
+            if (pipe.justPassed(bird.getBirdShape())) {
                 return true;
             }
         }
