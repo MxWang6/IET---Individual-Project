@@ -1,9 +1,12 @@
-package ie.tcd.mengxia;
+package ie.tcd.mengxia.object;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
-public class GameOverText implements GameObject {
+import ie.tcd.mengxia.FlappyBirdGame;
+import ie.tcd.mengxia.GameStatus;
+
+public class GameOverText implements Drawable {
 
     private static final Texture texture = new Texture(Gdx.files.internal("gameOver.png")); // 136 * 96
     private static final int gameOverWidth = 352; // in pixel
@@ -22,12 +25,15 @@ public class GameOverText implements GameObject {
     }
 
     @Override
-    public void render(float delta) {
-        // update game status with game over
-        game.setStatus(GameStatus.GAME_OVER);
+    public void draw() {
         // draw the game over sign
         game.getBatch().begin();
         game.getBatch().draw(texture, x, y, texture.getWidth(), texture.getHeight());
         game.getBatch().end();
+    }
+
+    @Override
+    public void update(float delta) {
+
     }
 }

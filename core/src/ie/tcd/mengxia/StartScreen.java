@@ -6,11 +6,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import ie.tcd.mengxia.FlappyBirdGame;
+import ie.tcd.mengxia.object.Background;
+import ie.tcd.mengxia.object.Bird;
+import ie.tcd.mengxia.object.StartButton;
+
 public class StartScreen extends ScreenAdapter {
     private final FlappyBirdGame game;
-    private final Background background;
-    private final Bird bird;
-    private final StartButton startButton;
+    private final ie.tcd.mengxia.object.Background background;
+    private final ie.tcd.mengxia.object.Bird bird;
+    private final ie.tcd.mengxia.object.StartButton startButton;
 
     public StartScreen(FlappyBirdGame game) {
         this.game = game;
@@ -21,6 +26,8 @@ public class StartScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        update(delta);
+
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         // tell the camera to update its matrices.
@@ -31,8 +38,14 @@ public class StartScreen extends ScreenAdapter {
         SpriteBatch batch = game.getBatch();
         batch.setProjectionMatrix(camera.combined);
 
-        background.render(delta);
-        bird.render(delta);
-        startButton.render(delta);
+        background.draw();
+        bird.draw();
+        startButton.draw();
+    }
+
+    private void update(float delta) {
+        background.update(delta);
+        bird.update(delta);
+        startButton.update(delta);
     }
 }

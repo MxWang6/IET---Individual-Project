@@ -1,8 +1,10 @@
-package ie.tcd.mengxia;
+package ie.tcd.mengxia.object;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+import ie.tcd.mengxia.Animation;
 
 /**
  * Created by jiefeng.yu on 23/11/2016.

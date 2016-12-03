@@ -7,26 +7,28 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Align;
 
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import ie.tcd.mengxia.object.*;
+import ie.tcd.mengxia.object.GameOverText;
 
 public class MainScreen extends ScreenAdapter {
     private static final String[] pipeName = {"tube.png","tube2.png","tube3.png","tube4.png"};
     private static final Texture textureGround = new Texture(Gdx.files.internal("ground.png"));
 
     private final FlappyBirdGame game;
-    private final Bird bird;
-    private final Background background;
-    private final GameOverText gameOver;
-    private final StartButton startButton;
-    private final Queue<Pipeline> pipelines = new ArrayBlockingQueue<Pipeline>(10);
+    private final ie.tcd.mengxia.object.Bird bird;
+    private final ie.tcd.mengxia.object.Background background;
+    private final ie.tcd.mengxia.object.GameOverText gameOver;
+    private final ie.tcd.mengxia.object.StartButton startButton;
+    private final Queue<ie.tcd.mengxia.object.Pipeline> pipelines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Pipeline>(10);
     private final Random randomPipelineNumberGenerator = new Random();
 
-    private Pipeline firstPipeline;
-    private Pipeline lastPipeline;
+    private ie.tcd.mengxia.object.Pipeline firstPipeline;
+    private ie.tcd.mengxia.object.Pipeline lastPipeline;
 
     private int score = 0;
     private float scoreShowTime = 0;
@@ -42,8 +44,19 @@ public class MainScreen extends ScreenAdapter {
         pipelines.add(firstPipeline);
     }
 
+    private void update(float delta) {
+        background.update(delta);
+        for (Pipeline pipeline : pipelines) {
+            pipeline.update(delta);
+        }
+        bird.update(delta);
+        gameOver.update(delta);
+        startButton.update(delta);
+    }
+
     @Override
     public void render (float delta) {
+        update(delta);
 
         Gdx.gl.glClearColor(1, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -57,19 +70,17 @@ public class MainScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
 
         // render the background scene
-        background.render(delta);
-
+        background.draw();
         // render the pipelines
         for (Pipeline pipeline : pipelines) {
-            pipeline.render(delta);
+            pipeline.draw();
         }
 
         batch.begin();
         batch.draw(textureGround, 0, 0, game.getScreenWidth(), game.getScreenHeight()/6);
         batch.end();
-
         // render the bird
-        bird.render(delta);
+        bird.draw();
 
         // remove off screen pipeline and assign the new first pipeline
         if (firstPipeline.getX() + firstPipeline.getWidth() <= 0) {
@@ -78,7 +89,7 @@ public class MainScreen extends ScreenAdapter {
         }
 
         // produce new pipleline
-        if (lastPipeline.getX() + lastPipeline.getWidth() + 200 < game.getScreenWidth() ) {
+        if (lastPipeline.getX() + lastPipeline.getWidth() + 300 < game.getScreenWidth() ) {
             int pipeNumber = randomPipelineNumberGenerator.nextInt(4);
             lastPipeline = new Pipeline(game);
             pipelines.add(lastPipeline);
@@ -86,8 +97,10 @@ public class MainScreen extends ScreenAdapter {
 
         if(bird.hitBoundary() || collides(bird.getBirdShape()))
         {
-            gameOver.render(delta);
-            startButton.render(delta);
+            gameOver.draw();
+            startButton.draw();
+            // update game status with game over
+            game.setStatus(GameStatus.GAME_OVER);
         }
 
         if (justPassed(bird.getBirdShape())) {
@@ -101,7 +114,7 @@ public class MainScreen extends ScreenAdapter {
     }
 
     private boolean collides(Rectangle birdShape) {
-        for (Pipeline pipe : pipelines) {
+        for (ie.tcd.mengxia.object.Pipeline pipe : pipelines) {
             if (pipe.collides(birdShape)) {
                 return true;
             }
@@ -110,7 +123,7 @@ public class MainScreen extends ScreenAdapter {
     }
 
     private boolean justPassed(Rectangle birdShape) {
-        for (Pipeline pipe : pipelines) {
+        for (ie.tcd.mengxia.object.Pipeline pipe : pipelines) {
             if (pipe.justPassed(bird.getBirdShape())) {
                 return true;
             }

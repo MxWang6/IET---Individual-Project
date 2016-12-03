@@ -1,4 +1,4 @@
-package ie.tcd.mengxia;
+package ie.tcd.mengxia.object;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Random;
 
-public class Pipeline implements GameObject {
+import ie.tcd.mengxia.FlappyBirdGame;
+
+public class Pipeline implements Drawable {
     private final FlappyBirdGame game;
     private final float moveVelocity;
     private static final Texture bambooTop = new Texture(Gdx.files.internal("bambooTop.png"));
@@ -31,17 +33,15 @@ public class Pipeline implements GameObject {
     }
 
     @Override
-    public void render(float delta) {
-        updatePosition(delta);
-
+    public void draw() {
         game.getBatch().begin();
-        // game.getBatch().draw(texture, x, y, texture.getWidth(), game.getScreenHeight());
         game.getBatch().draw(bambooTop, top.getX(), top.getY(), top.getWidth(), top.getHeight());
         game.getBatch().draw(bambooBottom, top.getX(), bottom.getY(), bottom.getWidth(), bottom.getHeight());
         game.getBatch().end();
     }
 
-    private void updatePosition(float delta) {
+    @Override
+    public void update(float delta) {
         switch (game.getStatus()) {
             case GAME_RUNNING:
                 top.x -= moveVelocity * delta;
