@@ -6,10 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import ie.tcd.mengxia.Animation;
 
-/**
- * Created by jiefeng.yu on 23/11/2016.
- */
-
 public class Coin {
     private static final Texture items = new Texture(Gdx.files.internal("items.png"));
     private static final Animation coinAnim = new Animation(0.2f,

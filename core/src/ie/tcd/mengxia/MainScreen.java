@@ -13,22 +13,20 @@ import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ie.tcd.mengxia.object.*;
-import ie.tcd.mengxia.object.GameOverText;
 
 public class MainScreen extends ScreenAdapter {
     private static final String[] pipeName = {"tube.png","tube2.png","tube3.png","tube4.png"};
     private static final Texture textureGround = new Texture(Gdx.files.internal("ground.png"));
 
     private final FlappyBirdGame game;
-    private final ie.tcd.mengxia.object.Bird bird;
-    private final ie.tcd.mengxia.object.Background background;
-    private final ie.tcd.mengxia.object.GameOverText gameOver;
-    private final ie.tcd.mengxia.object.StartButton startButton;
-    private final Queue<ie.tcd.mengxia.object.Pipeline> pipelines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Pipeline>(10);
+    private final Bird bird;
+    private final Background background;
+    private final StartButton startButton;
+    private final ScoreBoard scoreBoard;
+    private final Queue<Pipeline> pipelines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Pipeline>(10);
     private final Random randomPipelineNumberGenerator = new Random();
-
-    private ie.tcd.mengxia.object.Pipeline firstPipeline;
-    private ie.tcd.mengxia.object.Pipeline lastPipeline;
+    private Pipeline firstPipeline;
+    private Pipeline lastPipeline;
 
     private int score = 0;
     private float scoreShowTime = 0;
@@ -37,11 +35,11 @@ public class MainScreen extends ScreenAdapter {
         this.game = game;
         bird = new Bird(game);
         background= new Background(game);
-        gameOver = new GameOverText(game);
         startButton = new StartButton(game);
         firstPipeline = new Pipeline(game);
         lastPipeline = firstPipeline;
         pipelines.add(firstPipeline);
+        scoreBoard = new ScoreBoard(game);
     }
 
     private void update(float delta) {
@@ -50,7 +48,6 @@ public class MainScreen extends ScreenAdapter {
             pipeline.update(delta);
         }
         bird.update(delta);
-        gameOver.update(delta);
         startButton.update(delta);
     }
 
@@ -97,7 +94,7 @@ public class MainScreen extends ScreenAdapter {
 
         if(bird.hitBoundary() || collides(bird.getBirdShape()))
         {
-            gameOver.draw();
+            scoreBoard.draw();
             startButton.draw();
             // update game status with game over
             game.setStatus(GameStatus.GAME_OVER);
