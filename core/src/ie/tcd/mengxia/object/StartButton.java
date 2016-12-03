@@ -1,4 +1,4 @@
-package ie.tcd.mengxia;
+package ie.tcd.mengxia.object;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -6,7 +6,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
-public class StartButton implements GameObject {
+import ie.tcd.mengxia.FlappyBirdGame;
+import ie.tcd.mengxia.GameStatus;
+import ie.tcd.mengxia.MainScreen;
+
+public class StartButton implements Drawable {
     private static final Texture texture = new Texture(Gdx.files.internal("start.png"));
     private static final Sound clickSound = Gdx.audio.newSound(Gdx.files.internal("audio/click.wav"));
     private final FlappyBirdGame game;
@@ -23,8 +27,15 @@ public class StartButton implements GameObject {
     }
 
     @Override
-    public void render(float delta) {
-        if (Gdx.input.isTouched()) {
+    public void draw() {
+        game.getBatch().begin();
+        game.getBatch().draw(texture, shape.getX(), shape.getY(), shape.getWidth(), shape.getHeight());
+        game.getBatch().end();
+    }
+
+    @Override
+    public void update(float delta) {
+        if (game.getStatus() != GameStatus.GAME_RUNNING && Gdx.input.isTouched()) {
             Vector3 touchPoint = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             touchPoint = game.getCamera().unproject(touchPoint);
             if (shape.contains(touchPoint.x, touchPoint.y)) {
@@ -33,10 +44,5 @@ public class StartButton implements GameObject {
                 game.setScreen(new MainScreen(game));
             }
         }
-
-
-        game.getBatch().begin();
-        game.getBatch().draw(texture, shape.getX(), shape.getY(), shape.getWidth(), shape.getHeight());
-        game.getBatch().end();
     }
 }
