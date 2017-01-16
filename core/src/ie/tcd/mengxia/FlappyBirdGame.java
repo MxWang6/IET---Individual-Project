@@ -23,16 +23,21 @@ public class FlappyBirdGame extends Game {
 		camera = new OrthographicCamera(screenWidth, screenHeight);
 		camera.position.set(screenWidth / 2, screenHeight / 2, 0);
 
+		// create the music style of game
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/music.mp3"));
 		backgroundMusic.setLooping(true);
 		backgroundMusic.setVolume(0.1f);
 		backgroundMusic.play();
 
-		 font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+		// create the font style of game
+		font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+
+		// scale the font can be showed better on the screen
+        font.getData().setScale(0.65f,0.65f);
 
 		// TODO we need to change to the game ready when we introduce game ready.
+		// let gamestatus as GAME_Start so can be runned game to start screen
 		status = GameStatus.GAME_START;
-
 		setScreen(new StartScreen(this));
 	}
 

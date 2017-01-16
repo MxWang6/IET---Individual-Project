@@ -23,16 +23,18 @@ public class Pipeline implements Drawable {
 
     public Pipeline(FlappyBirdGame game) {
         this.game = game;
-        moveVelocity = game.getScreenWidth() / 5; //  /s
+        moveVelocity = game.getScreenWidth() / 5; // speed of moving pipeline
 
+        // set width and height of pipeline
         float x = game.getScreenWidth();
         float y = game.getScreenHeight()/6;
 
+        // create random pipeline with top and bottom
         top = new Rectangle(x, y + random.nextInt(RANDOM) + GAP_HEIGHT + 150, pipelineTop.getWidth() * 2, pipelineBottom.getHeight() * 2);
-
         bottom = new Rectangle(x, top.getY() - GAP_HEIGHT - pipelineBottom.getHeight() * 2, pipelineTop.getWidth() * 2, pipelineBottom.getHeight() * 2);
     }
 
+    // draw top pipeline and bottom pipeline
     @Override
     public void draw() {
         game.getBatch().begin();
@@ -41,6 +43,7 @@ public class Pipeline implements Drawable {
         game.getBatch().end();
     }
 
+    // update pipe status, pipeline will be produced during Game_Running status
     @Override
     public void update(float delta) {
         switch (game.getStatus()) {
@@ -57,11 +60,13 @@ public class Pipeline implements Drawable {
         }
     }
 
+    //create a method for bird pumping into pipelines
     public boolean collides(Rectangle boundsBird) {
         final boolean isColliding = boundsBird.overlaps(top) || boundsBird.overlaps(bottom);
         return isColliding;
     }
 
+    //create a method for bird passing the gap between the pipelines
     public boolean justPassed(Rectangle birdShape) {
         if (!justPassed && birdShape.x > top.x + top.width) {
                 return justPassed = true;
@@ -77,4 +82,8 @@ public class Pipeline implements Drawable {
     public float getWidth() {
         return top.getWidth();
     }
+
+    public float getY() { return top.y;}
+
+    public float getHeight() { return top.getHeight(); }
 }
