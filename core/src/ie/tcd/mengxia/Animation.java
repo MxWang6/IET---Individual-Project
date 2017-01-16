@@ -18,6 +18,7 @@ package ie.tcd.mengxia;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
+// animation class for objects with animation
 public class Animation {
 	final TextureRegion[] keyFrames;
 	final float frameDuration;

@@ -7,17 +7,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import ie.tcd.mengxia.Animation;
+import ie.tcd.mengxia.Assests;
 import ie.tcd.mengxia.FlappyBirdGame;
 
 public class Bird implements Drawable {
-    private static final Texture texture = new Texture(Gdx.files.internal("birdanimation.png")); // 136 * 96
-    private static final Animation birdAnimation = new Animation(0.3f,
-            new TextureRegion(texture, 0, 0, texture.getWidth() / 3, texture.getHeight()),
-            new TextureRegion(texture, texture.getWidth() / 3, 0, texture.getWidth() / 3, texture.getHeight()),
-            new TextureRegion(texture, texture.getWidth() / 3 * 2, 0, texture.getWidth() / 3, texture.getHeight()));
-
-    private static final Sound upSound = Gdx.audio.newSound(Gdx.files.internal("audio/up.wav"));
-
+    private final Texture texture;
+    private final Animation birdAnimation;
+    private final Sound upSound;
     private final FlappyBirdGame game;
     private final float dropVelocity;
     private final float upDistance;
@@ -26,16 +22,37 @@ public class Bird implements Drawable {
     private final Rectangle birdShape;
     private float stateTime = 0;
 
+    // private construct for bird class JUnit testing
+    private Bird(float stateTime, Texture texture, Animation birdAnimation, Sound upSound, FlappyBirdGame game, float dropVelocity, float upDistance, float topBoundary, float bottomBoundary, Rectangle birdShape) {
+        this.stateTime = stateTime;
+        this.texture = texture;
+        this.birdAnimation = birdAnimation;
+        this.upSound = upSound;
+        this.game = game;
+        this.dropVelocity = dropVelocity;
+        this.upDistance = upDistance;
+        this.topBoundary = topBoundary;
+        this.bottomBoundary = bottomBoundary;
+        this.birdShape = birdShape;
+    }
+
     public Bird(FlappyBirdGame game) {
         this.game = game;
-        dropVelocity = game.getScreenHeight() / 5;  // /s
+        dropVelocity = game.getScreenHeight() / 5;  // the speed of dropping
         upDistance = 15;
+        upSound = Assests.BIRD_UP_SOUND;
+        texture = Assests.BIRD_TEXTURE;
 
-        // float birdWidth = texture.getWidth() / 2;
-        // float birdHeight = texture.getHeight() / 2;
+        // animation bird texture
+        birdAnimation = new Animation(0.3f,
+                new TextureRegion(texture, 0, 0, texture.getWidth() / 3, texture.getHeight()),
+                new TextureRegion(texture, texture.getWidth() / 3, 0, texture.getWidth() / 3, texture.getHeight()),
+                new TextureRegion(texture, texture.getWidth() / 3 * 2, 0, texture.getWidth() / 3, texture.getHeight()));
+
         float birdWidth = texture.getWidth() / 3 * 2;
         float birdHeight = texture.getHeight() * 2;
-        // initial bird position (x, y) with width and height in the view port coord.
+
+        // initial bird position (x, y) with width and height in the view port coord as a similar rectangle
         birdShape = new Rectangle();
         birdShape.setWidth(birdWidth);
         birdShape.setHeight(birdHeight);
@@ -47,6 +64,8 @@ public class Bird implements Drawable {
         bottomBoundary = 180;
     }
 
+
+    // draw animation texture of bird
     @Override
     public void draw() {
         game.getBatch().begin();
@@ -54,6 +73,7 @@ public class Bird implements Drawable {
         game.getBatch().end();
     }
 
+    // update method for different game status
     @Override
     public void update(float delta) {
         switch (game.getStatus()) {
@@ -75,6 +95,7 @@ public class Bird implements Drawable {
         stateTime += delta;
     }
 
+    //hitBoundary when bird fly too high or touch the ground
     public boolean hitBoundary() {
         return birdShape.getY() <= 180 || birdShape.getY() >= topBoundary;
     }

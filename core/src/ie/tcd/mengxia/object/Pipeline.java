@@ -9,10 +9,11 @@ import java.util.Random;
 import ie.tcd.mengxia.FlappyBirdGame;
 
 public class Pipeline implements Drawable {
+    private static final Texture pipelineTop = new Texture(Gdx.files.internal("tubetop.png"));
+    private static final Texture pipelineBottom = new Texture(Gdx.files.internal("tubebottom.png"));
+
     private final FlappyBirdGame game;
     private final float moveVelocity;
-    private static final Texture bambooTop = new Texture(Gdx.files.internal("bambooTop.png"));
-    private static final Texture bambooBottom = new Texture(Gdx.files.internal("bambooBottom.png"));
     private final Rectangle top;
     private final Rectangle bottom;
     private static Random random = new Random();
@@ -22,24 +23,27 @@ public class Pipeline implements Drawable {
 
     public Pipeline(FlappyBirdGame game) {
         this.game = game;
-        moveVelocity = game.getScreenWidth() / 5; //  /s
+        moveVelocity = game.getScreenWidth() / 5; // speed of moving pipeline
 
+        // set width and height of pipeline
         float x = game.getScreenWidth();
         float y = game.getScreenHeight()/6;
 
-        top = new Rectangle(x, y + random.nextInt(RANDOM) + GAP_HEIGHT + 150, bambooTop.getWidth() * 1.5f, bambooBottom.getHeight() * 1.5f);
-
-        bottom = new Rectangle(x, top.getY() - GAP_HEIGHT - bambooBottom.getHeight() * 1.5f, bambooTop.getWidth() * 1.5f, bambooBottom.getHeight() * 1.5f);
+        // create random pipeline with top and bottom
+        top = new Rectangle(x, y + random.nextInt(RANDOM) + GAP_HEIGHT + 150, pipelineTop.getWidth() * 2, pipelineBottom.getHeight() * 2);
+        bottom = new Rectangle(x, top.getY() - GAP_HEIGHT - pipelineBottom.getHeight() * 2, pipelineTop.getWidth() * 2, pipelineBottom.getHeight() * 2);
     }
 
+    // draw top pipeline and bottom pipeline
     @Override
     public void draw() {
         game.getBatch().begin();
-        game.getBatch().draw(bambooTop, top.getX(), top.getY(), top.getWidth(), top.getHeight());
-        game.getBatch().draw(bambooBottom, top.getX(), bottom.getY(), bottom.getWidth(), bottom.getHeight());
+        game.getBatch().draw(pipelineTop, top.getX(), top.getY(), top.getWidth(), top.getHeight());
+        game.getBatch().draw(pipelineBottom, top.getX(), bottom.getY(), bottom.getWidth(), bottom.getHeight());
         game.getBatch().end();
     }
 
+    // update pipe status, pipeline will be produced during Game_Running status
     @Override
     public void update(float delta) {
         switch (game.getStatus()) {
@@ -56,11 +60,13 @@ public class Pipeline implements Drawable {
         }
     }
 
+    //create a method for bird pumping into pipelines
     public boolean collides(Rectangle boundsBird) {
         final boolean isColliding = boundsBird.overlaps(top) || boundsBird.overlaps(bottom);
         return isColliding;
     }
 
+    //create a method for bird passing the gap between the pipelines
     public boolean justPassed(Rectangle birdShape) {
         if (!justPassed && birdShape.x > top.x + top.width) {
                 return justPassed = true;
@@ -76,4 +82,8 @@ public class Pipeline implements Drawable {
     public float getWidth() {
         return top.getWidth();
     }
+
+    public float getY() { return top.y;}
+
+    public float getHeight() { return top.getHeight(); }
 }

@@ -24,6 +24,14 @@ public class StartScreen extends ScreenAdapter {
         startButton = new StartButton(game);
     }
 
+    // private startScreen constructor for JUnit test
+    private StartScreen(FlappyBirdGame game, Background background, Bird bird, StartButton startButton) {
+        this.game = game;
+        this.background = background;
+        this.bird = bird;
+        this.startButton = startButton;
+    }
+
     @Override
     public void render(float delta) {
         update(delta);

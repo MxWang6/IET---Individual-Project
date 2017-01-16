@@ -13,45 +13,52 @@ import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import ie.tcd.mengxia.object.*;
-import ie.tcd.mengxia.object.GameOverText;
 
 public class MainScreen extends ScreenAdapter {
-    private static final String[] pipeName = {"tube.png","tube2.png","tube3.png","tube4.png"};
+  //  private static final String[] pipeName = {"tube.png","tube2.png","tube3.png","tube4.png"};
     private static final Texture textureGround = new Texture(Gdx.files.internal("ground.png"));
 
     private final FlappyBirdGame game;
-    private final ie.tcd.mengxia.object.Bird bird;
-    private final ie.tcd.mengxia.object.Background background;
-    private final ie.tcd.mengxia.object.GameOverText gameOver;
-    private final ie.tcd.mengxia.object.StartButton startButton;
-    private final Queue<ie.tcd.mengxia.object.Pipeline> pipelines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Pipeline>(10);
+    private final Bird bird;
+    private final Background background;
+    private final StartButton startButton;
+    private final ScoreBoard scoreBoard;
+    private  Coin coin;
+    private final Queue<Coin> coinlines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Coin>(10);
+    private final Queue<Pipeline> pipelines = new ArrayBlockingQueue<ie.tcd.mengxia.object.Pipeline>(10);
     private final Random randomPipelineNumberGenerator = new Random();
-
-    private ie.tcd.mengxia.object.Pipeline firstPipeline;
-    private ie.tcd.mengxia.object.Pipeline lastPipeline;
+    private Pipeline firstPipeline;
+    private Pipeline lastPipeline;
 
     private int score = 0;
+    private int scoreForCoins = 0;
     private float scoreShowTime = 0;
 
     public MainScreen(FlappyBirdGame game) {
         this.game = game;
         bird = new Bird(game);
         background= new Background(game);
-        gameOver = new GameOverText(game);
         startButton = new StartButton(game);
         firstPipeline = new Pipeline(game);
         lastPipeline = firstPipeline;
         pipelines.add(firstPipeline);
+        scoreBoard = new ScoreBoard(game);
+        coin = new Coin(game);
+        coinlines.add(coin);
     }
 
+    // update method for background, bird, pipeline and birdline
     private void update(float delta) {
         background.update(delta);
         for (Pipeline pipeline : pipelines) {
             pipeline.update(delta);
         }
         bird.update(delta);
-        gameOver.update(delta);
         startButton.update(delta);
+        for (Coin coinline : coinlines) {
+            coinline.update(delta);
+        }
+
     }
 
     @Override
@@ -71,6 +78,7 @@ public class MainScreen extends ScreenAdapter {
 
         // render the background scene
         background.draw();
+
         // render the pipelines
         for (Pipeline pipeline : pipelines) {
             pipeline.draw();
@@ -79,8 +87,15 @@ public class MainScreen extends ScreenAdapter {
         batch.begin();
         batch.draw(textureGround, 0, 0, game.getScreenWidth(), game.getScreenHeight()/6);
         batch.end();
+
+        // render the coin
+        for (Coin coinline : coinlines) {
+            coinline.draw();
+        }
+
         // render the bird
         bird.draw();
+
 
         // remove off screen pipeline and assign the new first pipeline
         if (firstPipeline.getX() + firstPipeline.getWidth() <= 0) {
@@ -90,29 +105,50 @@ public class MainScreen extends ScreenAdapter {
 
         // produce new pipleline
         if (lastPipeline.getX() + lastPipeline.getWidth() + 300 < game.getScreenWidth() ) {
-            int pipeNumber = randomPipelineNumberGenerator.nextInt(4);
+
+            // for pipelines
             lastPipeline = new Pipeline(game);
             pipelines.add(lastPipeline);
+
+            // for coinlines
+            coin = new Coin(game);
+            coinlines.add(coin);
+
         }
 
+        // bump into pipe
         if(bird.hitBoundary() || collides(bird.getBirdShape()))
         {
-            gameOver.draw();
+            scoreBoard.draw();
             startButton.draw();
             // update game status with game over
             game.setStatus(GameStatus.GAME_OVER);
         }
 
+        // pass through gap between pipes
         if (justPassed(bird.getBirdShape())) {
             score ++;
         }
 
+        // count the score of coins
+        if(getCoins(bird.getBirdShape()))
+        {
+            scoreForCoins ++;
+        }
+
+        // show number of pipelines on the screen
         game.getBatch().begin();
-        String scoreString = Integer.toString(score);
-        game.font.draw(game.getBatch(), scoreString, game.getScreenWidth()/2, game.getScreenHeight()/3 * 2);
+        String scoreString = "Pipe: "+Integer.toString(score);
+        game.font.draw(game.getBatch(), scoreString, game.getScreenWidth()/6-50, game.getScreenHeight()/3 * 2+300);
+
+        // show number of coinlines on the screen
+        String scoreCoinsString = "Coin: " + Integer.toString(scoreForCoins);
+        game.font.draw(game.getBatch(), scoreCoinsString, game.getScreenWidth()/6-50, game.getScreenHeight()/3 * 2+240);
+
         game.getBatch().end();
     }
 
+    // return true when pump into pipeline
     private boolean collides(Rectangle birdShape) {
         for (ie.tcd.mengxia.object.Pipeline pipe : pipelines) {
             if (pipe.collides(birdShape)) {
@@ -122,9 +158,22 @@ public class MainScreen extends ScreenAdapter {
         return false;
     }
 
+    // return true when pass the gap between pipeline
     private boolean justPassed(Rectangle birdShape) {
         for (ie.tcd.mengxia.object.Pipeline pipe : pipelines) {
             if (pipe.justPassed(bird.getBirdShape())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // return trun when bird get coins
+    private boolean getCoins(Rectangle birdShape){
+        for (ie.tcd.mengxia.object.Coin coin : coinlines) {
+            if (coin.getCoins(birdShape)) {
+                coin.playCoinSound();
+                coinlines.remove();
                 return true;
             }
         }
